@@ -124,4 +124,16 @@ gcloud iam service-accounts add-iam-policy-binding  github-sa@$PROJECT_ID.iam.gs
 10) IN GITHUB ADD SECRET NAMED WIF_PROVIDER  IN THE FORMAT **projects/REPLACE_WITH_PROJECT_NUMBER/locations/global/workloadIdentityPools/github-pool/providers/github**
 11) ADDD ANOTHER SECRET NAMED  WIF__SERVICE_ACCOUNT IN THE FORMAT 
 **github-sa@PROJECT_ID.iam.gserviceaccount.com**
+13) LOGIN TO YOUR GITHUB ACCOUNT TO PUSH THE CODE
+```bash
+echo "ENTER YOUR REPO URL(HTTPS)"
+read REPO_URL
+```
+```bash
+git remote add  target $REPO_URL
+git add .
+git commit -m "code added"
+git push origin main
 
+```
+## successfully completed the deployment part .to experience this use kubectl get svc to get the service of type loadbalancer named frontend-lb-test in test cluster and frontend-lb-prod in prod cluster  .also again change some code in server.py located in app  folder   and commit you code to see changes to the ui in both services 
