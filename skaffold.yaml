@@ -1,0 +1,26 @@
+apiVersion: skaffold/v4beta4
+kind: Config
+profiles:
+- name: test 
+  deploy:
+      kubectl: {}
+  manifests:
+   rawYaml:
+   - "k8s-files/test/*"
+  verify:
+  - name: check-http
+    container:
+      name: cnt-1
+      image: python 
+      command: ["/bin/bash"]
+      args: ["-c", "curl http://frontend-lb-test/health"]
+    executionMode:
+        kubernetesCluster: {}
+         
+- name: prod 
+  deploy:
+    kubectl: {}
+  manifests:
+    rawYaml:
+    - "k8s-files/prod/*"
+

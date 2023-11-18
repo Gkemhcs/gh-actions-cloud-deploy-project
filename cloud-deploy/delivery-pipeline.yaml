@@ -1,0 +1,94 @@
+apiVersion: deploy.cloud.google.com/v1
+kind: DeliveryPipeline
+metadata:
+  name:  gh-actions-pipeline 
+description: THIS DEMONSTRATES THE CD PIPELINE INTEGRATED WITH GITHUB 
+serialPipeline:
+  stages:
+  - profiles:
+    - test 
+    targetId: test
+    strategy:
+      standard:
+         verify: true
+    
+  - profiles:
+    - prod 
+    targetId: prod 
+    strategy:
+      canary:
+         runtimeConfig:
+          kubernetes:
+            serviceNetworking:
+              service: "frontend-lb-prod"
+              deployment: "frontend-prod"
+         canaryDeployment:
+          percentages: [10,25,50]
+          verify: false
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: test
+description: test GKE cluster
+gke:  
+  cluster:   projects/GOOGLE_CLOUD_PROJECT_ID/locations/asia-south2-a/clusters/cluster-test 
+executionConfigs:
+  - defaultPool:
+        serviceAccount:  deploy-runner@GOOGLE_CLOUD_PROJECT_ID.iam.gserviceaccount.com
+    usages:
+      - RENDER 
+      - DEPLOY 
+      - VERIFY
+     
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: prod
+description: prod GKE cluster
+gke:  
+  cluster:   projects/GOOGLE_CLOUD_PROJECT_ID/locations/us-central1-a/clusters/cluster-prod
+executionConfigs:
+  - defaultPool:
+        serviceAccount:  deploy-runner@GOOGLE_CLOUD_PROJECT_ID.iam.gserviceaccount.com
+    usages:
+      - RENDER 
+      - DEPLOY 
+
+     
+---
+apiVersion:   deploy.cloud.google.com/v1
+kind: Automation
+metadata:
+   name: gh-actions-pipeline/promoter
+   labels:
+      type: promoter 
+description: "automate the promotion from test to prod "
+serviceAccount: deploy-promoter@GOOGLE_CLOUD_PROJECT_ID.iam.gserviceaccount.com
+selector:
+- target:
+    id: test
+rules:
+- promoteRelease:
+    name: promote-to-prod 
+    wait: 4m
+  
+---
+apiVersion:   deploy.cloud.google.com/v1
+kind: Automation
+metadata:
+   name: gh-actions-pipeline/advancer
+   labels:
+      type: advancer
+description: "automate the advancement of canary rollout "
+serviceAccount: deploy-promoter@GOOGLE_CLOUD_PROJECT_ID.iam.gserviceaccount.com
+selector:
+- target:
+    id: prod
+rules:
+- advanceRollout:
+    name: advance-canary
+    wait: 2m
+    sourcePhases: ["canary-50"]
+    

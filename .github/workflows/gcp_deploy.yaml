@@ -1,0 +1,51 @@
+run-name: gcp-deploy-run
+name: gcp-deploy
+on:
+   push:
+      paths: 
+      - "app/**"
+env:
+  PROJECT_ID: "GOOGLE_CLOUD_PROJECT_ID"
+  GAR_LOCATION: "asia-south2"
+  REGISTRY_NAME: "repo-github"
+jobs:
+    deploy_to_gcp:
+      permissions:
+         id-token: write
+         contents: write
+      runs-on: ubuntu-latest
+      steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:
+          token_format: 'access_token'
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}' # e.g. - projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
+          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
+      - name: Docker Auth
+        id: docker-auth
+        uses: 'docker/login-action@v1'
+        with:
+          username: 'oauth2accesstoken'
+          password: '${{ steps.auth.outputs.access_token }}'
+          registry: '${{ env.GAR_LOCATION }}-docker.pkg.dev'
+     
+      - name: Build and Push Container
+        run: |-
+          cd app 
+          
+          docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/frontend:${{ github.sha }}"  ./
+          docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/frontend:${{ github.sha }}"
+      
+      
+      - id: create-release
+        uses: 'google-github-actions/create-cloud-deploy-release@v0.2.0'
+        with:
+          name: "release-${{github.sha}}"
+          description: 'Add new functionality to demo-app'
+          delivery_pipeline: 'gh-actions-pipeline'
+          region: 'asia-south2'
+          images: "demo-app=${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/frontend:${{ github.sha }}"
+          skaffold_file: skaffold.yaml

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+metadata:
+   name: frontend-test
+kind: Deployment
+spec:
+     replicas : 3  # from-param: ${replica_count} 
+     selector:
+        matchLabels:
+          
+          app: frontend 
+     template:
+        metadata:
+          labels:
+             app: frontend
+        spec:
+          containers:
+          - name: cnt-1
+            env:
+            - name: ENVIRONMENT
+              value: testing
+            image:  demo-app
+            ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service 
+metadata:
+   name: frontend-lb-test
+spec:
+  selector: 
+    app: frontend 
+  type: LoadBalancer
+  ports:
+  - targetPort: 8080
+    port: 80
