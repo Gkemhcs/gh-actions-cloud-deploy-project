@@ -17,7 +17,7 @@ TOOLS USED:
        AND THEN CREATE  CLOUD-DEPLOY RELEASES TO  INITIATE CONTINOUS DELIVERY
        PROCESS 
 ### STEPS TO DEPLOY THE PROJECT:-
-1) CLONE THE PROJECT INTO CLOUDSHELL/LOCAL WORKSTATION
+1)CLONE THE PROJECT INTO CLOUDSHELL/LOCAL WORKSTATION
 ```bash
 git clone  https://github.com/Gkemhcs/gh-actions-cloud-deploy-gcp.git
 cd gh-actions-cloud-deploy-gcp
@@ -47,7 +47,7 @@ gcloud container clusters create cluster-prod --zone us-central1-a \
 --num-nodes 1 \
 --machine-type e2-standard-4 
 ```
-4)CREATING THE REQUIRED IAM SERVICE-ACCOUNTS 
+4)CREATE  REQUIRED IAM SERVICE-ACCOUNTS 
 ```bash
 gcloud iam service-accounts create github-sa
 gcloud iam service-accounts create deploy-runner
