@@ -133,7 +133,7 @@ read REPO_URL
 git remote add  target $REPO_URL
 git add .
 git commit -m "code added"
-git push origin main
+git push target main
 
 ```
 ### successfully completed the deployment part ,to experience this use ***kubectl get svc*** to get the service of type loadbalancer named frontend-lb-test in test cluster and frontend-lb-prod in prod cluster ,then again change some code in server.py located in app  folder   and commit the code to see changes to the ui in both services test,prod
