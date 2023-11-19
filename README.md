@@ -122,7 +122,7 @@ export PROJECT_NUMBER=$(gcloud projects describe $PROJECT_ID --format "value(pro
 gcloud iam service-accounts add-iam-policy-binding  github-sa@$PROJECT_ID.iam.gserviceaccount.com  --member "principalSet://iam.googleapis.com/projects/${PROJECT_NUMBER}/locations/global/workloadIdentityPools/github-pool/attribute.workflow/gcp-deploy" --role roles/iam.workloadIdentityUser
 ```
 10) IN GITHUB ADD SECRET NAMED WIF_PROVIDER  IN THE FORMAT **projects/REPLACE_WITH_PROJECT_NUMBER/locations/global/workloadIdentityPools/github-pool/providers/github**
-11) ADDD ANOTHER SECRET NAMED  WIF__SERVICE_ACCOUNT IN THE FORMAT 
+11) ADDD ANOTHER SECRET NAMED  WIF_SERVICE_ACCOUNT IN THE FORMAT 
 **github-sa@PROJECT_ID.iam.gserviceaccount.com**
 13) LOGIN TO YOUR GITHUB ACCOUNT TO PUSH THE CODE
 ```bash
